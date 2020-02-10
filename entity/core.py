@@ -76,24 +76,27 @@ class Gardener:
 
 class Mover:
     def __init__(self, universe):
+        self._universe = universe
         self.x_max = universe.x - 1
         self.y_max = universe.y - 1
 
     def up(self, x, y):
-        return x, max(0, y-1)
+        return (x, max(0, y-1))
 
     def down(self, x, y):
-        return x, min(self.y_max, y+1)
+        return (x, min(self.y_max, y+1))
 
     def left(self, x, y):
-        return max(0, x-1), y
+        return (max(0, x-1), y)
 
     def right(self, x, y):
-        return min(self.x_max, x+1)
+        return (min(self.x_max, x+1), y)
 
     def move(self, entities):
         for entity in entities:
             new_x, new_y = getattr(self, entity.speak)(entity.x, entity.y)
+            self._universe.universe[new_x][new_y] = entity
+            self._universe.universe[entity.x][entity.y] = 0
             entity.x = new_x
             entity.y = new_y
 
@@ -109,6 +112,7 @@ class WorldSimulator:
         self.gardener = Gardener(self.universe, self.food_quantity)
         self.mover = Mover(self.universe)
         self.initialize_entities()
+        self._image = None
         self.main_loop()
 
     def initialize_entities(self):
@@ -125,7 +129,7 @@ class WorldSimulator:
         for i in range(self.iterations):
             for entity in self.entities:
                 entity.think()
-            self.mover.move(self.outputs)
+            self.mover.move(self.entities)
             self.outputs = []
             self.show()
             time.sleep(2)
@@ -138,7 +142,12 @@ class WorldSimulator:
                 return item.display()
 
         image = [[display(item) for item in row] for row in self.universe.universe]
-        for row in self.universe.universe: print(row)
-        for row in image: print(row)
-        plt.imshow(image)
-        plt.show()
+
+        if self._image is None:
+            self._image = plt.imshow(image)
+            plt.ion()
+            plt.show()
+        else:
+            self._image.set_data(image)
+            plt.draw()
+            plt.pause(0.001)
