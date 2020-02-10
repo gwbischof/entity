@@ -1,3 +1,3 @@
 from entity.core import WorldSimulator
 
-world = WorldSimulator(10,10,10,10,100)
+world = WorldSimulator(30,30,30,30,1000)

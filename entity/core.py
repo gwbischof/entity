@@ -132,7 +132,7 @@ class WorldSimulator:
             self.mover.move(self.entities)
             self.outputs = []
             self.show()
-            time.sleep(2)
+            time.sleep(0.02)
 
     def show(self):
         def display(item):
